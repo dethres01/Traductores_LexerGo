@@ -53,6 +53,7 @@ var keywords = map[string]Token{
 	"print":    KEYWORD,
 	"println":  KEYWORD,
 	"scan":     KEYWORD,
+	"func":     KEYWORD,
 }
 
 // tokens
