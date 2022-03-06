@@ -19,45 +19,85 @@ const (
 	EOF     = iota
 	ILLEGAL // 1
 	IDENT   // 2
-	INT     // 3
-	SEMI    // ; 4
+	SEMI    // ; 3
 
 	// Infix operators.
-	ADD // + 5
-	SUB // - 6
-	MUL // * 7
-	DIV // / 8
+	ADD // + 4
+	SUB // - 5
+	MUL // * 6
+	DIV // / 7
 
-	ASSIGN // = 9
+	ASSIGN // = 8
 	// Symbols
-	LPAREN // ( 10
-	RPAREN // ) 	11
-	LBRACE // { 12
-	RBRACE // } 	13
+	LPAREN // ( 9
+	RPAREN // ) 	10
+	LBRACE // { 11
+	RBRACE // } 	12
 	// Keywords.
-	KEYWORD // 14
+	// data types
+	INT    // int 14
+	STRING // string 15
+	BOOL   // bool 16
+	// Conditionals
+	IF   // if 17
+	THEN // THEN 18
+	ELSE // ELSE 19
+	// Loops
+	WHILE // while 20
+	DO    // do 21
+	BREAK // break 22
+	// various keywords
+	TRUE  // true 22
+	FALSE // false 23
+	// functions
+	FUNC   // func 24
+	RETURN // return 25
+	PRINT  // print 25
+
 )
 
 //ARRAY OF KEYWORDS
 var keywords = map[string]Token{
-	"int":      KEYWORD,
-	"return":   KEYWORD,
-	"if":       KEYWORD,
-	"else":     KEYWORD,
-	"while":    KEYWORD,
-	"for":      KEYWORD,
-	"break":    KEYWORD,
-	"continue": KEYWORD,
-	"bool":     KEYWORD,
-	"true":     KEYWORD,
-	"false":    KEYWORD,
-	"string":   KEYWORD,
-	"void":     KEYWORD,
-	"main":     KEYWORD,
-	"print":    KEYWORD,
-	"println":  KEYWORD,
-	"scan":     KEYWORD,
-	"func":     KEYWORD,
+	"int":    INT,
+	"string": STRING,
+	"bool":   BOOL,
+	"if":     IF,
+	"then":   THEN,
+	"else":   ELSE,
+	"while":  WHILE,
+	"do":     DO,
+	"break":  BREAK,
+	"true":   TRUE,
+	"false":  FALSE,
+	"func":   FUNC,
+	"print":  PRINT,
+	"return": RETURN,
+}
+
+func (l *Lexer) lexIdent() (Token, string) {
+	var lit string
+	for {
+		r, _, err := l.reader.ReadRune()
+		if err != nil {
+			if err == io.EOF {
+				return IDENT, lit
+			}
+		}
+		l.pos.col++
+		if unicode.IsLetter(r) {
+			lit += string(r)
+		} else {
+			l.backup()
+			return l.lookupIdent(lit), lit
+		}
+	}
+}
+
+func (l *Lexer) lookupIdent(lit string) Token {
+	if tok, ok := keywords[lit]; ok {
+		return tok
+	}
+	return IDENT
 }
 
 // tokens
