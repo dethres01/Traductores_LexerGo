@@ -1,37 +1,41 @@
-package main
+package Lexer
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
 	"unicode"
 )
 
+type RawData struct {
+	pos Position
+	tok Token
+	lit string
+}
 type Token int // Token types
 
 // Token types
 const (
-	EOF = iota
-	ILLEGAL
-	IDENT
-	INT
-	SEMI // ;
+	EOF     = iota
+	ILLEGAL // 1
+	IDENT   // 2
+	INT     // 3
+	SEMI    // ; 4
 
 	// Infix operators.
-	ADD // +
-	SUB // -
-	MUL // *
-	DIV // /
+	ADD // + 5
+	SUB // - 6
+	MUL // * 7
+	DIV // / 8
 
-	ASSIGN // =
+	ASSIGN // = 9
 	// Symbols
-	LPAREN // (
-	RPAREN // )
-	LBRACE // {
-	RBRACE // }
+	LPAREN // ( 10
+	RPAREN // ) 	11
+	LBRACE // { 12
+	RBRACE // } 	13
 	// Keywords.
-	KEYWORD
+	KEYWORD // 14
 )
 
 //ARRAY OF KEYWORDS
@@ -94,6 +98,8 @@ func NewLexer(reader io.Reader) *Lexer {
 		reader: bufio.NewReader(reader),
 	}
 }
+
+var Raw []RawData
 
 func (l *Lexer) Lex() (Position, Token, string) {
 	for {
@@ -197,7 +203,6 @@ func (l *Lexer) lexIdent() (Token, string) {
 		if unicode.IsLetter(r) {
 			lit += string(r)
 		} else {
-			fmt.Println(lit)
 			if tok, ok := keywords[lit]; ok {
 				return tok, lit
 			}
@@ -207,13 +212,9 @@ func (l *Lexer) lexIdent() (Token, string) {
 	}
 }
 
-func main() {
-	if val, ok := keywords["pene"]; ok {
-		fmt.Println(val)
-	} else {
-		fmt.Println("not found")
-	}
+// create global slice of RawData
 
+func Run() {
 	file, err := os.Open("test.txt")
 	if err != nil {
 		panic(err)
@@ -225,6 +226,8 @@ func main() {
 		if tok == EOF {
 			break
 		}
-		fmt.Printf("%d:%d\t%s\t%s\n", pos.line, pos.col, tok, lit)
+		// append to slice
+		Raw = append(Raw, RawData{pos, tok, lit})
 	}
+
 }
