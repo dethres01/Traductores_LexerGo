@@ -74,6 +74,34 @@ var keywords = map[string]Token{
 	"return": RETURN,
 }
 
+func isWhiteSpace(ch rune) bool {
+	return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r'
+}
+
+func isLetter(ch rune) bool {
+	return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
+}
+
+var eof = rune(0)
+
+type Scanner struct {
+	r *bufio.Reader
+}
+
+func NewScanner(r io.Reader) *Scanner {
+	return &Scanner{r: bufio.NewReader(r)}
+}
+
+func (s *Scanner) read() rune {
+	ch, _, err := s.r.ReadRune()
+	if err != nil {
+		return eof
+	}
+	return ch
+}
+
+func (s *Scanner) unread() { _ = s.r.UnreadRune() }
+
 func (l *Lexer) lexIdent() (Token, string) {
 	var lit string
 	for {
