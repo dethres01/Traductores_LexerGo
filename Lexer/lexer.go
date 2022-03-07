@@ -51,6 +51,14 @@ const (
 	RETURN // return 25
 	PRINT  // print 25
 	VAR
+	// comparative symbols
+	EQUALS // ==
+	LESS_THAN
+	MORE_THAN
+	MORE_OR_EQUALS_THAN
+	LESS_OR_EQUALS_THAN
+	NOT
+	NOT_EQUALS
 )
 
 //ARRAY OF KEYWORDS
@@ -81,6 +89,12 @@ func isLetter(ch rune) bool {
 }
 func isNumber(ch rune) bool {
 	return unicode.IsDigit(ch)
+}
+func checkComparison(ch rune) bool {
+	return (ch == '<' || ch == '>' || ch == '=' || ch == '!')
+}
+func IsComparative(tok Token) bool {
+	return tok == EQUALS || tok == LESS_THAN || tok == MORE_THAN || tok == MORE_OR_EQUALS_THAN || tok == LESS_OR_EQUALS_THAN || tok == NOT || tok == NOT_EQUALS
 }
 
 var eof = rune(0)
@@ -115,6 +129,10 @@ func (s *Scanner) Scan() (tok Token, lit string) {
 	} else if isNumber(ch) {
 		s.unread()
 		return s.scanNumber()
+	} else if checkComparison(ch) {
+		// we have to check if it is a comparative symbol
+		s.unread()
+		return s.scanComparison()
 	}
 	// if it isn't one of those it's a token
 	switch ch {
@@ -197,7 +215,39 @@ func (s *Scanner) scanNumber() (tok Token, lit string) {
 	}
 	return INT, buf.String()
 }
-
+func (s *Scanner) scanComparison() (tok Token, lit string) {
+	var buf bytes.Buffer
+	buf.WriteRune(s.read())
+	for {
+		if ch := s.read(); ch == eof {
+			break
+		} else if !checkComparison(ch) {
+			s.unread()
+			break
+		} else {
+			buf.WriteRune(ch)
+		}
+	}
+	// check content of buf
+	switch buf.String() {
+	case "==":
+		return EQUALS, buf.String()
+	case "<":
+		return LESS_THAN, buf.String()
+	case ">":
+		return MORE_THAN, buf.String()
+	case ">=":
+		return MORE_OR_EQUALS_THAN, buf.String()
+	case "<=":
+		return LESS_OR_EQUALS_THAN, buf.String()
+	case "!":
+		return NOT, buf.String()
+	case "!=":
+		return NOT_EQUALS, buf.String()
+	default:
+		return ILLEGAL, buf.String()
+	}
+}
 func IsInfix(tok Token) bool {
 	return tok == ADD || tok == SUB || tok == MUL || tok == DIV || tok == ASSIGN
 }
