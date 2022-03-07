@@ -1,12 +1,3 @@
-ab = 5;
-b = a + 6;
-c + 123;
-5+12;
-a = 5 = 3;
-if das = 3{
-
-}
-
-func(t) String() string {
-    
-}
+var c bool
+var b string
+var a int

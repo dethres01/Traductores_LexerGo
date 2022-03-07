@@ -2,10 +2,30 @@ package main
 
 import (
 	"AnalisisLexico/Lexer"
+	"AnalisisLexico/Parser"
 	"fmt"
+	"os"
 )
 
 func main() {
-	Lexer.Run()
-	fmt.Println(Lexer.Raw[3])
+	// create new scanner
+	// read fil
+	// turn file into an io.Reader
+	f, err := os.Open("test.txt")
+	if err != nil {
+		fmt.Println(err)
+	}
+	s := Lexer.NewScanner(f)
+
+	// create new parser
+	p := Parser.NewParser(s)
+
+	// parse
+	result, err := p.ParseDeclaration()
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(result)
+	}
+
 }
