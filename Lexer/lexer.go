@@ -196,3 +196,7 @@ func (s *Scanner) scanNumber() (tok Token, lit string) {
 	}
 	return INT, buf.String()
 }
+
+func IsInfix(tok Token) bool {
+	return tok == ADD || tok == SUB || tok == MUL || tok == DIV || tok == ASSIGN
+}
