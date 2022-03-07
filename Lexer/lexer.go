@@ -24,6 +24,7 @@ const (
 	DIV // / 7
 
 	ASSIGN // = 8
+	DECLARATION
 	// Symbols
 	LPAREN // ( 9
 	RPAREN // ) 	10

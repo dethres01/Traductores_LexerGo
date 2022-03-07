@@ -36,6 +36,12 @@ func (p *Parser) ParseAssignment() (*Assignment, error) {
 		} else {
 			return nil, fmt.Errorf("expected field, got %s", lit)
 		}
+		tok, _ = p.scanIgnoreWhitespace()
+		if tok == Lexer.EOF {
+			return stmt, nil
+		} else {
+			p.unscan()
+		}
 		// now we expect a infix operator
 		tok, lit = p.scanIgnoreWhitespace()
 		if !Lexer.IsInfix(tok) {
