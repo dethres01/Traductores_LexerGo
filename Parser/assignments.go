@@ -66,3 +66,25 @@ func (p *Parser) ParseAssignment() (*Assignment, error) {
 		}
 	}
 }
+
+func (p *Parser) ParseBool() (*Assignment, error) {
+	// look for identifier
+	tok, lit := p.scanIgnoreWhitespace()
+	if tok != Lexer.IDENT {
+		return nil, fmt.Errorf("expected identifier, got %s", lit)
+	}
+	stmt := &Assignment{}
+	stmt.Identifier = lit
+	// now we expect "="
+	tok, lit = p.scanIgnoreWhitespace()
+	if tok != Lexer.ASSIGN {
+		return nil, fmt.Errorf("expected =, got %s", lit)
+	}
+	// now we expect a either true or false
+	tok, lit = p.scanIgnoreWhitespace()
+	if tok != Lexer.TRUE && tok != Lexer.FALSE {
+		return nil, fmt.Errorf("expected true or false, got %s", lit)
+	}
+	stmt.Fields = append(stmt.Fields, lit)
+	return stmt, nil
+}
