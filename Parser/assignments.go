@@ -13,15 +13,21 @@ type Assignment struct {
 func (p *Parser) ParseAssignment() (*Assignment, error) {
 	// we are expecting an identifier
 	tok, lit := p.scanIgnoreWhitespace()
+	fmt.Println(tok, lit)
+
 	if tok != Lexer.IDENT {
 		return nil, fmt.Errorf("expected identifier, got %s", lit)
 	}
 	stmt := &Assignment{Identifier: lit}
+	stmt.Fields = append(stmt.Fields, lit)
 	// now we expect "="
 	tok, lit = p.scanIgnoreWhitespace()
+	fmt.Println(tok, lit)
+
 	if tok != Lexer.ASSIGN {
 		return nil, fmt.Errorf("expected =, got %s", lit)
 	}
+	stmt.Fields = append(stmt.Fields, lit)
 	// now we expect a list of fields
 	for {
 		// we expect a field, either an IDENT or an INT
@@ -47,6 +53,7 @@ func (p *Parser) ParseAssignment() (*Assignment, error) {
 		if !Lexer.IsInfix(tok) {
 			return nil, fmt.Errorf("expected infix operator, got %s", lit)
 		}
+		stmt.Fields = append(stmt.Fields, lit)
 		// now we expect a field, either an IDENT or an INT
 		tok, lit = p.scanIgnoreWhitespace()
 		if tok == Lexer.EOF {
@@ -62,6 +69,7 @@ func (p *Parser) ParseAssignment() (*Assignment, error) {
 		// if eof, we are done
 		tok, _ = p.scanIgnoreWhitespace()
 		if tok == Lexer.EOF {
+			fmt.Println(stmt)
 			return stmt, nil
 		}
 	}

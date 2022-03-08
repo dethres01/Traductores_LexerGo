@@ -3,6 +3,7 @@ package Lexer
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io"
 	"unicode"
 )
@@ -12,53 +13,54 @@ type Token int // Token types
 // Token types
 const (
 	EOF     = iota
-	ILLEGAL // 1
-	WS      // Whitespace
-	IDENT   // 2
-	SEMI    // ; 3
+	ILLEGAL // illegal token 1
+	WS      // Whitespace 2
+	IDENT   // Identifier 3
+	SEMI    // ; 4
 
 	// Infix operators.
-	ADD // + 4
-	SUB // - 5
-	MUL // * 6
-	DIV // / 7
+	ADD // + 5
+	SUB // - 6
+	MUL // * 7
+	DIV // / 8
 
-	ASSIGN // = 8
-	DECLARATION
+	ASSIGN      // =  10
+	DECLARATION // : 11
 	// Symbols
-	LPAREN // ( 9
-	RPAREN // ) 	10
-	LBRACE // { 11
-	RBRACE // } 	12
+	LPAREN // (  12
+	RPAREN // )  13
+	LBRACE // {  14
+	RBRACE // }  15
 	// Keywords.
 	// data types
-	INT    // int 14
-	STRING // string 15
-	BOOL   // bool 16
-	// Conditionals
-	IF   // if 17
-	THEN // THEN 18
-	ELSE // ELSE 19
+	INT    // int 16
+	STRING // string 17
+	BOOL   // bool 18
+	// Conditionals 19
+	IF   // if 20
+	THEN // THEN 21
+	ELSE // ELSE 22
 	// Loops
-	WHILE // while 20
-	DO    // do 21
-	BREAK // break 22
+	WHILE // while 23
+	DO    // d 24
+	BREAK // break 25
 	// various keywords
-	TRUE  // true 22
-	FALSE // false 23
+	TRUE  // true 26
+	FALSE // false 27
 	// functions
-	FUNC   // func 24
-	RETURN // return 25
-	PRINT  // print 25
-	VAR
+	FUNC   // func 28
+	RETURN // return 29
+	PRINT  // print 30
+	VAR    //31
 	// comparative symbols
-	EQUALS // ==
-	LESS_THAN
-	MORE_THAN
-	MORE_OR_EQUALS_THAN
-	LESS_OR_EQUALS_THAN
-	NOT
-	NOT_EQUALS
+	EQUALS              // == 32
+	LESS_THAN           // < 33
+	MORE_THAN           // > 34
+	MORE_OR_EQUALS_THAN // >= 35
+	LESS_OR_EQUALS_THAN // <= 36
+	NOT                 // ! 37
+	NOT_EQUALS          // != 38
+	END                 // end 39
 )
 
 //ARRAY OF KEYWORDS
@@ -78,6 +80,7 @@ var keywords = map[string]Token{
 	"print":  PRINT,
 	"return": RETURN,
 	"var":    VAR,
+	"end":    END,
 }
 
 func isWhiteSpace(ch rune) bool {
@@ -157,9 +160,7 @@ func (s *Scanner) Scan() (tok Token, lit string) {
 	case '}':
 		return RBRACE, string(ch)
 	case ';':
-		return SEMI, string(ch)
-	case '\n':
-		return EOF, ""
+		return EOF, string(ch)
 	default:
 		return ILLEGAL, string(ch)
 	}
@@ -168,6 +169,8 @@ func (s *Scanner) scanWhitespace() (tok Token, lit string) {
 	var buf bytes.Buffer
 	buf.WriteRune(s.read())
 	for {
+		fmt.Println("scanning whitespace")
+		fmt.Println(buf.String())
 		if ch := s.read(); ch == eof {
 		} else if !isWhiteSpace(ch) {
 			s.unread()
@@ -244,6 +247,8 @@ func (s *Scanner) scanComparison() (tok Token, lit string) {
 		return NOT, buf.String()
 	case "!=":
 		return NOT_EQUALS, buf.String()
+	case "=":
+		return ASSIGN, buf.String()
 	default:
 		return ILLEGAL, buf.String()
 	}

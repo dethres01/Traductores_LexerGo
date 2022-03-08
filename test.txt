@@ -1,1 +1,1 @@
-a = tru
+if a>b then { b=a+b; c=c*2;} else { b=a;} end 
