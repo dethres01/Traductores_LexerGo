@@ -1,1 +1,1 @@
-if a>b then { b=a+b; c=c*2;} else { b=a;} end 
+do {a=a+b; c=c*3;} while(a>b) end
