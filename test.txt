@@ -1,1 +1,9 @@
-do {a=a+b; c=c*3;} while(a>b) end
+begin
+
+int i,a,b;
+float x,y,z;
+
+i = 10;
+while(i>0) c=a; endwhile;
+if (i == 10) a = 1; b=3;else x=1.25;end;
+end

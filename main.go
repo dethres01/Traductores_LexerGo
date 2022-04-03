@@ -21,7 +21,7 @@ func main() {
 	p := Parser.NewParser(s)
 
 	// parse
-	result, err := p.ParseWhile()
+	result, err := p.ParseProgram()
 	if err != nil {
 		fmt.Println(err)
 	} else {

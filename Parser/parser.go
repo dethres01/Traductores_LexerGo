@@ -24,6 +24,7 @@ func (p *Parser) scan() (tok Lexer.Token, lit string) {
 	}
 	tok, lit = p.s.Scan()
 	p.buf.tok, p.buf.lit = tok, lit
+
 	return
 }
 

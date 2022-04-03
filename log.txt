@@ -1,0 +1,106 @@
+ParseDeclarations
+ParseDeclaration
+ParseType
+ParseVariableList
+ParseIdentifier
+ParseRestVariableList
+ParseRestVariableList 13 ,
+ParseVariableList
+ParseIdentifier
+ParseRestVariableList
+ParseRestVariableList 13 ,
+ParseVariableList
+ParseIdentifier
+ParseRestVariableList
+ParseRestVariableList 12 ;
+declaration:  [0xc0000960a8 0xc0000960c0]
+tok:  12 ;
+ParseRestDeclarations 18 float
+ParseDeclaration
+ParseType
+ParseVariableList
+ParseIdentifier
+ParseRestVariableList
+ParseRestVariableList 13 ,
+ParseVariableList
+ParseIdentifier
+ParseRestVariableList
+ParseRestVariableList 13 ,
+ParseVariableList
+ParseIdentifier
+ParseRestVariableList
+ParseRestVariableList 12 ;
+ParseRestDeclarations 6 i
+ParseRestDeclarations Entered type check
+declarations:  &{[0xc000096090 ; 0xc0000961b0]}
+ParseStatements
+ParseStatement
+ParseAssign
+tok:  6 i
+tok:  11 =
+ParseExpression
+tok:  17 10
+Number expression
+tok:  17 10
+buffer tok:  17 10
+ParseRestExp
+buffer tok:  17 10
+tok:  12 ;
+ParseRestExp Epsilon Entered
+buf:  12 ;
+ParseStatements check for ;
+tok:  12 ;
+ParseRestStatements
+tok:  7 if
+returning statement
+ParseStatement
+ParseCondition
+ParseComparison
+ParseOperator
+ParseConditionOp
+ParseOperator
+ParseStatements
+ParseStatement
+ParseAssign
+tok:  6 a
+tok:  11 =
+ParseExpression
+tok:  17 1
+Number expression
+tok:  17 1
+buffer tok:  17 1
+ParseRestExp
+buffer tok:  17 1
+tok:  12 ;
+ParseRestExp Epsilon Entered
+buf:  12 ;
+ParseStatements check for ;
+tok:  12 ;
+ParseRestStatements
+tok:  6 b
+returning statement
+ParseStatement
+ParseAssign
+tok:  6 b
+tok:  11 =
+ParseExpression
+tok:  17 3
+Number expression
+tok:  17 3
+buffer tok:  17 3
+ParseRestExp
+buffer tok:  17 3
+tok:  12 ;
+ParseRestExp Epsilon Entered
+buf:  12 ;
+ParseRestStatements check for ;
+ParseRestStatements
+tok:  5 end
+returning epsilon
+ParseRestCondition
+ParseRestStatements check for ;
+ParseRestStatements
+tok:  5 end
+returning epsilon
+statement:  &{[0xc000096330 ; 0xc000096558]}
+&{[begin 0xc000096078 0xc000096318]}

@@ -5,29 +5,56 @@ import (
 	"fmt"
 )
 
+// <condicion> → if (<comparación>) <ordenes> <rest_condicion>
+
 type Condition struct {
-	part1 string
-	part2 string
-	cond  string
+	AbstractSyntaxTree []interface{}
 }
 
 func (p *Parser) ParseCondition() (*Condition, error) {
-	cond := &Condition{}
+	condition := &Condition{}
+	fmt.Println("ParseCondition")
+	// check for if
 	tok, lit := p.scanIgnoreWhitespace()
-	if !(tok == Lexer.IDENT || tok == Lexer.INT) {
-		return nil, fmt.Errorf("expected identifier, got %s", lit)
+	if tok != Lexer.IF {
+		return nil, fmt.Errorf("expected if, got %s", lit)
 	}
-	cond.part1 = lit
+	condition.AbstractSyntaxTree = append(condition.AbstractSyntaxTree, lit)
+
+	// check for (
 	tok, lit = p.scanIgnoreWhitespace()
-	fmt.Println(tok, lit)
-	if !Lexer.IsComparative(tok) {
-		return nil, fmt.Errorf("expected conditional, got %s", lit)
+	if tok != Lexer.LPAREN {
+		return nil, fmt.Errorf("expected (, got %s", lit)
 	}
-	cond.cond = lit
+	condition.AbstractSyntaxTree = append(condition.AbstractSyntaxTree, lit)
+
+	// check for <comparación>
+	comparison, err := p.ParseComparison()
+	if err != nil {
+		return nil, err
+	}
+	condition.AbstractSyntaxTree = append(condition.AbstractSyntaxTree, comparison)
+
+	// check for )
 	tok, lit = p.scanIgnoreWhitespace()
-	if !(tok == Lexer.IDENT || tok == Lexer.INT) {
-		return nil, fmt.Errorf("expected identifier, got %s", lit)
+	if tok != Lexer.RPAREN {
+		return nil, fmt.Errorf("expected ), got %s", lit)
 	}
-	cond.part2 = lit
-	return cond, nil
+	condition.AbstractSyntaxTree = append(condition.AbstractSyntaxTree, lit)
+
+	// check for <ordenes>
+	statements, err := p.ParseStatements()
+	if err != nil {
+		return nil, err
+	}
+	condition.AbstractSyntaxTree = append(condition.AbstractSyntaxTree, statements)
+
+	// check for <rest_condicion>
+	restCondition, err := p.ParseRestCondition()
+	if err != nil {
+		return nil, err
+	}
+	condition.AbstractSyntaxTree = append(condition.AbstractSyntaxTree, restCondition)
+
+	return condition, nil
 }

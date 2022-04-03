@@ -3,6 +3,7 @@ package Lexer
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io"
 	"unicode"
 )
@@ -62,6 +63,7 @@ var keywords = map[string]Token{
 	"endwhile": ENDWHILE,
 	"int":      INT,
 	"float":    FLOAT,
+	"eps":      EPSILON,
 }
 
 func isWhiteSpace(ch rune) bool {
@@ -81,7 +83,13 @@ func IsComparative(tok Token) bool {
 	return tok == EQUALS || tok == LESS_THAN || tok == MORE_THAN || tok == MORE_OR_EQUALS_THAN || tok == LESS_OR_EQUALS_THAN || tok == NOT_EQUALS
 }
 func IsInfix(tok Token) bool {
-	return tok == ADD || tok == SUB || tok == MUL || tok == DIV || tok == ASSIGN
+	return tok == ADD || tok == SUB || tok == MUL || tok == DIV
+}
+func IsNum(tok Token) bool {
+	return tok == INT || tok == FLOAT
+}
+func IsStatement(tok Token) bool {
+	return tok == IF || tok == WHILE || tok == ID
 }
 
 var eof = rune(0)
@@ -125,17 +133,22 @@ func (s *Scanner) Scan() (tok Token, lit string) {
 		return RPAREN, string(ch)
 	case '(':
 		return LPAREN, string(ch)
-	case '.':
-		return POINT, string(ch)
 	default:
 		// we have to check for complex symbols like comparative, identifiers, numbers
 		if isWhiteSpace(ch) {
+
+			s.unread()
 			return s.scanWhitespace()
 		} else if isLetter(ch) {
+
+			s.unread()
 			return s.scanIdent()
 		} else if isNumber(ch) {
+
+			s.unread()
 			return s.scanNumber()
 		} else if checkComplex(ch) {
+			s.unread()
 			return s.scanComplex()
 		}
 		return ILLEGAL, string(ch)
@@ -161,6 +174,7 @@ func (s *Scanner) scanIdent() (tok Token, lit string) {
 	var buf bytes.Buffer
 	buf.WriteRune(s.read())
 	for {
+
 		if ch := s.read(); ch == eof {
 			break
 		} else if !isLetter(ch) && !isNumber(ch) {
@@ -180,38 +194,33 @@ func (s *Scanner) scanIdent() (tok Token, lit string) {
 // TODO: Could probably simplify function, we have two exact blocks of code
 func (s *Scanner) scanNumber() (tok Token, lit string) {
 	var buf bytes.Buffer
+	isFloat := false
 	buf.WriteRune(s.read())
+	fmt.Println("floating test", buf.String())
 	for {
 		if ch := s.read(); ch == eof {
 			break
 		} else if !isNumber(ch) {
-			s.unread()
-			break
+			if ch == '.' && !isFloat {
+
+				isFloat = true
+				buf.WriteRune(ch)
+			} else if isFloat && ch == '.' {
+				fmt.Println("floating test", buf.String())
+				return ILLEGAL, buf.String()
+			} else {
+				s.unread()
+				break
+			}
 		} else {
 			buf.WriteRune(ch)
+
 		}
 	}
 	// check for point to see if it is a float
-
-	if ch := s.read(); ch == '.' {
-		buf.WriteRune(ch)
-
-		if ch := s.read(); isNumber(ch) {
-			buf.WriteRune(ch)
-			for {
-				if ch := s.read(); ch == eof {
-					break
-				} else if !isNumber(ch) {
-					s.unread()
-					break
-				} else {
-					buf.WriteRune(ch)
-				}
-			}
-			return FLOAT, buf.String()
-		} else {
-			s.unread()
-		}
+	fmt.Println("floating test", buf.String())
+	if isFloat {
+		return FLOAT, buf.String()
 	}
 	return INT, buf.String()
 }
