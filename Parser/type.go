@@ -11,19 +11,22 @@ type Type struct {
 	AbstractSyntaxTree []interface{}
 }
 
-func (p *Parser) ParseType() (*Type, error) {
-	type_ := &Type{}
+func (p *Parser) ParseType() (*ASTNode, string, error) {
+	type_ := &ASTNode{}
+	// these are terminal nodes
 	fmt.Println("ParseType")
 	// they are both terminals we check for them
 	tok, lit := p.scanIgnoreWhitespace()
 	if tok != Lexer.INT && tok != Lexer.FLOAT {
-		return nil, fmt.Errorf("expected type (int or float), got %s", lit)
+		return nil, "", fmt.Errorf("expected type (int or float), got %s", lit)
 	}
 	if tok == Lexer.INT {
-		type_.AbstractSyntaxTree = append(type_.AbstractSyntaxTree, "int")
+		type_.TokenType = Lexer.INT
+		type_.TokenValue = "int"
 	} else {
-		type_.AbstractSyntaxTree = append(type_.AbstractSyntaxTree, "float")
+		type_.TokenType = Lexer.FLOAT
+		type_.TokenValue = "float"
 	}
 
-	return type_, nil
+	return type_, type_.TokenValue, nil
 }

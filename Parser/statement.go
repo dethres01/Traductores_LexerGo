@@ -7,12 +7,8 @@ import (
 
 //<orden> → <condicion> | <bucle_while> | <asignar>
 
-type Statement struct {
-	AbstractSyntaxTree []interface{}
-}
-
-func (p *Parser) ParseStatement() (*Statement, error) {
-	statement := &Statement{}
+func (p *Parser) ParseStatement() (*ASTNode, string, error) {
+	statement := &ASTNode{TokenType: Lexer.STATEMENT}
 
 	fmt.Println("ParseStatement")
 	// condition or while loop or assign
@@ -20,30 +16,33 @@ func (p *Parser) ParseStatement() (*Statement, error) {
 	tok, lit := p.scanIgnoreWhitespace()
 	if tok == Lexer.IF {
 		p.unscan()
-		condition, err := p.ParseCondition()
+		condition, condition_v, err := p.ParseCondition()
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
-		statement.AbstractSyntaxTree = append(statement.AbstractSyntaxTree, condition)
+		statement.Children = append(statement.Children, *condition)
+		statement.TokenValue = condition_v
 	} else if tok == Lexer.WHILE {
 		p.unscan()
-		whileLoop, err := p.ParseWhileLoop()
+		whileLoop, whilev, err := p.ParseWhileLoop()
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
-		statement.AbstractSyntaxTree = append(statement.AbstractSyntaxTree, whileLoop)
+		statement.Children = append(statement.Children, *whileLoop)
+		statement.TokenValue = whilev
 
 	} else if tok == Lexer.ID {
 		p.unscan()
-		assign, err := p.ParseAssign()
+		assign, assignv, err := p.ParseAssign()
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
-		statement.AbstractSyntaxTree = append(statement.AbstractSyntaxTree, assign)
+		statement.Children = append(statement.Children, *assign)
+		statement.TokenValue = assignv
 
 	} else {
-		return nil, fmt.Errorf("expected valid statement, got %s", lit)
+		return nil, "", fmt.Errorf("expected valid statement, got %s", lit)
 	}
 
-	return statement, nil
+	return statement, statement.TokenValue, nil
 }

@@ -7,12 +7,8 @@ import (
 
 //<rest_ordenes> → <orden>; <rest_ordenes> | epsilon
 
-type RestStatements struct {
-	AbstractSyntaxTree []interface{}
-}
-
-func (p *Parser) ParseRestStatements() (*RestStatements, error) {
-	restStatements := &RestStatements{}
+func (p *Parser) ParseRestStatements() (*ASTNode, string, error) {
+	restStatements := &ASTNode{TokenType: Lexer.REST_STATEMENTS}
 	// we check for a statement, otherwise we return epsilon
 	fmt.Println("ParseRestStatements")
 	tok, lit := p.scanIgnoreWhitespace()
@@ -25,28 +21,30 @@ func (p *Parser) ParseRestStatements() (*RestStatements, error) {
 	} else {
 		fmt.Println("returning statement")
 		p.unscan()
-		statement, err := p.ParseStatement()
+		statement, statement_value, err := p.ParseStatement()
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
-		restStatements.AbstractSyntaxTree = append(restStatements.AbstractSyntaxTree, statement)
+		restStatements.Children = append(restStatements.Children, *statement)
 
 		// check for ;
 		fmt.Println("ParseRestStatements check for ;")
 		tok, lit := p.scanIgnoreWhitespace()
 		if tok != Lexer.SEMICOLON {
-			return nil, fmt.Errorf("expected ;, got %s", lit)
+			return nil, "", fmt.Errorf("expected ;, got %s", lit)
 		}
-		restStatements.AbstractSyntaxTree = append(restStatements.AbstractSyntaxTree, lit)
+		restStatements.Children = append(restStatements.Children, ASTNode{TokenType: tok, TokenValue: lit})
 
 		// check for <rest_ordenes>
 		// checks for recursion in the future
 
-		restStatements, err = p.ParseRestStatements()
+		restStatements_r, value, err := p.ParseRestStatements()
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
-		restStatements.AbstractSyntaxTree = append(restStatements.AbstractSyntaxTree, restStatements)
+		result := fmt.Sprintf("%s;%s", statement_value, value)
+		restStatements.Children = append(restStatements.Children, *restStatements_r)
+		restStatements.TokenValue = result
 	}
-	return restStatements, nil
+	return restStatements, restStatements.TokenValue, nil
 }

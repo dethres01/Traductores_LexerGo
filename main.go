@@ -24,8 +24,11 @@ func main() {
 	result, err := p.ParseProgram()
 	if err != nil {
 		fmt.Println(err)
-	} else {
-		fmt.Println(result)
 	}
+	// fmt.Println(result)
+	// print tree
 
+	for _, v := range result.AbstractSyntaxTree {
+		fmt.Println(v.TokenValue)
+	}
 }

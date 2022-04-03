@@ -7,12 +7,8 @@ import (
 
 // <rest_arit> → <operador_arit><expresion_arit><rest_arit> | epsilon
 
-type RestExp struct {
-	AbstractSyntaxTree []interface{}
-}
-
-func (p *Parser) ParseRestExp() (*RestExp, error) {
-	restExp := &RestExp{}
+func (p *Parser) ParseRestExp() (*ASTNode, string, error) {
+	restExp := &ASTNode{TokenType: Lexer.REST_EXP}
 	fmt.Println("ParseRestExp")
 	fmt.Println("buffer tok: ", p.buf.tok, p.buf.lit)
 	// blank or infix operator
@@ -22,30 +18,32 @@ func (p *Parser) ParseRestExp() (*RestExp, error) {
 		p.unscan()
 		fmt.Println("ParseRestExp Infix Entered")
 		// <operador_arit>
-		operatorArit, err := p.ParseOperatorArit()
+		operatorArit, operatorArit_value, err := p.ParseOperatorArit()
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
-		restExp.AbstractSyntaxTree = append(restExp.AbstractSyntaxTree, operatorArit)
+		restExp.Children = append(restExp.Children, *operatorArit)
 
 		// <expresion_arit>
-		exp, err := p.ParseExpression()
+		exp, exp_value, err := p.ParseExpression()
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
-		restExp.AbstractSyntaxTree = append(restExp.AbstractSyntaxTree, exp)
+		restExp.Children = append(restExp.Children, *exp)
 
 		// <rest_arit>
-		rest, err := p.ParseRestExp()
+		rest, restExp_value, err := p.ParseRestExp()
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
-		restExp.AbstractSyntaxTree = append(restExp.AbstractSyntaxTree, rest)
+		restExp.Children = append(restExp.Children, *rest)
+		result := operatorArit_value + " " + exp_value + " " + restExp_value
+		restExp.TokenValue = result
 	} else {
 		p.unscan()
 		fmt.Println("ParseRestExp Epsilon Entered")
 		fmt.Println("buf: ", p.buf.tok, p.buf.lit)
 	}
 
-	return restExp, nil
+	return restExp, restExp.TokenValue, nil
 }

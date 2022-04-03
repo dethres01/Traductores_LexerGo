@@ -1,37 +1,39 @@
 package Parser
 
-import "fmt"
+import (
+	"AnalisisLexico/Lexer"
+	"fmt"
+)
 
 // <comparacion> → <operador> <condicion_op> <operador>
 
-type Comparison struct {
-	AbstractSyntaxTree []interface{}
-}
-
-func (p *Parser) ParseComparison() (*Comparison, error) {
-	comparison := &Comparison{}
+func (p *Parser) ParseComparison() (*ASTNode, string, error) {
+	comparison := &ASTNode{TokenType: Lexer.COMPARISON}
 	fmt.Println("ParseComparison")
 
 	// check for <operador>
-	operador, err := p.ParseOperator()
+	operador, op1, err := p.ParseOperator()
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
-	comparison.AbstractSyntaxTree = append(comparison.AbstractSyntaxTree, operador)
+	comparison.Children = append(comparison.Children, *operador)
 
 	// check for <condicion_op>
-	condicionOp, err := p.ParseConditionOp()
+	condicionOp, cond, err := p.ParseConditionOp()
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
-	comparison.AbstractSyntaxTree = append(comparison.AbstractSyntaxTree, condicionOp)
+
+	comparison.Children = append(comparison.Children, *condicionOp)
 
 	// check for <operador>
-	operador, err = p.ParseOperator()
+	operador2, op2, err := p.ParseOperator()
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
-	comparison.AbstractSyntaxTree = append(comparison.AbstractSyntaxTree, operador)
+	comparison.Children = append(comparison.Children, *operador2)
+	result := fmt.Sprintf("%s %s %s", op1, cond, op2)
+	comparison.TokenValue = result
 
-	return comparison, nil
+	return comparison, comparison.TokenValue, nil
 }

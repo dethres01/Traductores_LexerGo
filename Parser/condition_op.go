@@ -7,21 +7,18 @@ import (
 
 //<condicion_op> → == | < | > | <= | >= | <>
 
-type ConditionOp struct {
-	AbstractSyntaxTree []interface{}
-}
-
-func (p *Parser) ParseConditionOp() (*ConditionOp, error) {
-	condition_op := &ConditionOp{}
+func (p *Parser) ParseConditionOp() (*ASTNode, string, error) {
+	condition_op := &ASTNode{TokenType: Lexer.CONDITION_OP}
 	fmt.Println("ParseConditionOp")
 	// it has to be either ==, <, >, <=, >= or <>
 	tok, lit := p.scanIgnoreWhitespace()
 	if Lexer.IsComparative(tok) {
-		condition_op.AbstractSyntaxTree = append(condition_op.AbstractSyntaxTree, lit)
+		condition_op.TokenValue = lit
+		condition_op.Children = append(condition_op.Children, ASTNode{TokenType: tok, TokenValue: lit})
 	} else {
-		return nil, fmt.Errorf("expected comparative operator, got %s", lit)
+		return nil, "", fmt.Errorf("expected comparative operator, got %s", lit)
 	}
 
-	return condition_op, nil
+	return condition_op, condition_op.TokenValue, nil
 
 }

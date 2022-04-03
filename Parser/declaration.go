@@ -1,29 +1,29 @@
 package Parser
 
-import "fmt"
+import (
+	"AnalisisLexico/Lexer"
+	"fmt"
+)
 
 //<declaracion> → <tipo> <lista_variables>
 
-type Declaration struct {
-	AbstractSyntaxTree []interface{}
-}
-
-func (p *Parser) ParseDeclaration() (*Declaration, error) {
-	declaration := &Declaration{}
+func (p *Parser) ParseDeclaration() (*ASTNode, string, error) {
+	declaration := &ASTNode{TokenType: Lexer.DECLARATION}
 	fmt.Println("ParseDeclaration")
 	// check for <tipo>
-	tipo, err := p.ParseType()
+	tipo, type_value, err := p.ParseType()
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
-	declaration.AbstractSyntaxTree = append(declaration.AbstractSyntaxTree, tipo)
-
+	declaration.Children = append(declaration.Children, *tipo)
 	// check for <lista_variables>
-	listaVariables, err := p.ParseVariableList()
+	listaVariables, variableList_value, err := p.ParseVariableList()
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
-	declaration.AbstractSyntaxTree = append(declaration.AbstractSyntaxTree, listaVariables)
+	declaration.Children = append(declaration.Children, *listaVariables)
+	result := fmt.Sprintf("%s %s", type_value, variableList_value)
+	declaration.TokenValue = result
 
-	return declaration, nil
+	return declaration, declaration.TokenValue, nil
 }

@@ -7,12 +7,8 @@ import (
 
 //<rest_declaraciones> → <declaracion>;<rest_declaracion> | epsilon
 
-type RestDeclarations struct {
-	AbstractSyntaxTree []interface{}
-}
-
-func (p *Parser) ParseRestDeclarations() (*RestDeclarations, error) {
-	restDeclarations := &RestDeclarations{}
+func (p *Parser) ParseRestDeclarations() (*ASTNode, string, error) {
+	restDeclarations := &ASTNode{TokenType: Lexer.REST_DECLARATIONS}
 
 	// this could be either blank(epsilon) or <declaracion>;
 	// for performance reasons we could check for type since we know it's a declaration
@@ -27,27 +23,31 @@ func (p *Parser) ParseRestDeclarations() (*RestDeclarations, error) {
 		p.unscan()
 
 		// check for <declaracion>
-		declaration, err := p.ParseDeclaration()
+		declaration, declaration_value, err := p.ParseDeclaration()
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
-		restDeclarations.AbstractSyntaxTree = append(restDeclarations.AbstractSyntaxTree, declaration)
+		// add child to the declarations
+		restDeclarations.Children = append(restDeclarations.Children, *declaration)
 
 		// check for ;
 		tok, lit := p.scanIgnoreWhitespace()
 		if tok != Lexer.SEMICOLON {
-			return nil, fmt.Errorf("expected ;, got %s", lit)
+			return nil, "", fmt.Errorf("expected ;, got %s", lit)
 		}
-		restDeclarations.AbstractSyntaxTree = append(restDeclarations.AbstractSyntaxTree, lit)
+		restDeclarations.Children = append(restDeclarations.Children, ASTNode{TokenType: tok, TokenValue: lit})
 
 		// check for <rest_declaracion>
 		// probably will end up having to go back here since it's recursive
-		restDeclaration, err := p.ParseRestDeclarations()
+		restDeclaration_r, value, err := p.ParseRestDeclarations()
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
-		restDeclarations.AbstractSyntaxTree = append(restDeclarations.AbstractSyntaxTree, restDeclaration)
+		result := fmt.Sprintf("%s;%s", declaration_value, value)
+		restDeclarations.Children = append(restDeclarations.Children, *restDeclaration_r)
+		restDeclarations.TokenValue = result
+
 	}
 
-	return restDeclarations, nil
+	return restDeclarations, restDeclarations.TokenValue, nil
 }

@@ -7,55 +7,52 @@ import (
 
 // <bucle_while> → while (<comparacion>) <ordenes> endwhile
 
-type WhileLoop struct {
-	AbstractSyntaxTree []interface{}
-}
-
-func (p *Parser) ParseWhileLoop() (*WhileLoop, error) {
-	whileLoop := &WhileLoop{}
+func (p *Parser) ParseWhileLoop() (*ASTNode, string, error) {
+	whileLoop := &ASTNode{TokenType: Lexer.WHILE_LOOP}
 
 	fmt.Println("ParseWhileLoop")
 	// check for while
 	tok, lit := p.scanIgnoreWhitespace()
 	if tok != Lexer.WHILE {
-		return nil, fmt.Errorf("expected while, got %s", lit)
+		return nil, "", fmt.Errorf("expected while, got %s", lit)
 	}
-	whileLoop.AbstractSyntaxTree = append(whileLoop.AbstractSyntaxTree, lit)
+	whileLoop.Children = append(whileLoop.Children, ASTNode{TokenType: tok, TokenValue: lit})
 
 	// check for (
 	tok, lit = p.scanIgnoreWhitespace()
 	if tok != Lexer.LPAREN {
-		return nil, fmt.Errorf("expected (, got %s", lit)
+		return nil, "", fmt.Errorf("expected (, got %s", lit)
 	}
-	whileLoop.AbstractSyntaxTree = append(whileLoop.AbstractSyntaxTree, lit)
+	whileLoop.Children = append(whileLoop.Children, ASTNode{TokenType: tok, TokenValue: lit})
 
 	// check for <comparacion>
-	comparacion, err := p.ParseComparison()
+	comparacion, comparison_value, err := p.ParseComparison()
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
-	whileLoop.AbstractSyntaxTree = append(whileLoop.AbstractSyntaxTree, comparacion)
+	whileLoop.Children = append(whileLoop.Children, *comparacion)
 
 	// check for )
 	tok, lit = p.scanIgnoreWhitespace()
 	if tok != Lexer.RPAREN {
-		return nil, fmt.Errorf("expected ), got %s", lit)
+		return nil, "", fmt.Errorf("expected ), got %s", lit)
 	}
-	whileLoop.AbstractSyntaxTree = append(whileLoop.AbstractSyntaxTree, lit)
+	whileLoop.Children = append(whileLoop.Children, ASTNode{TokenType: tok, TokenValue: lit})
 
 	// check for <ordenes>
-	ordenes, err := p.ParseStatements()
+	ordenes, statements_value, err := p.ParseStatements()
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
-	whileLoop.AbstractSyntaxTree = append(whileLoop.AbstractSyntaxTree, ordenes)
+	whileLoop.Children = append(whileLoop.Children, *ordenes)
 
 	// check for endwhile
 	tok, lit = p.scanIgnoreWhitespace()
 	if tok != Lexer.ENDWHILE {
-		return nil, fmt.Errorf("expected endwhile, got %s", lit)
+		return nil, "", fmt.Errorf("expected endwhile, got %s", lit)
 	}
-	whileLoop.AbstractSyntaxTree = append(whileLoop.AbstractSyntaxTree, lit)
-
-	return whileLoop, nil
+	whileLoop.Children = append(whileLoop.Children, ASTNode{TokenType: tok, TokenValue: lit})
+	result := fmt.Sprintf("while (%s) %s endwhile", comparison_value, statements_value)
+	whileLoop.TokenValue = result
+	return whileLoop, whileLoop.TokenValue, nil
 }

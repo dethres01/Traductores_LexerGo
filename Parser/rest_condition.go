@@ -6,36 +6,37 @@ import (
 )
 
 // <rest_condicion> → end | else <ordenes> end
-type restCondition struct {
-	AbstractSyntaxTree []interface{}
-}
 
-func (p *Parser) ParseRestCondition() (*restCondition, error) {
-	restCondition := &restCondition{}
+func (p *Parser) ParseRestCondition() (*ASTNode, string, error) {
+	restCondition := &ASTNode{TokenType: Lexer.REST_CONDITION}
 	fmt.Println("ParseRestCondition")
 	// it has to be either end or else
 	tok, lit := p.scanIgnoreWhitespace()
 	if tok == Lexer.END {
-		restCondition.AbstractSyntaxTree = append(restCondition.AbstractSyntaxTree, lit)
+		restCondition.TokenValue = lit
+		restCondition.Children = append(restCondition.Children, ASTNode{TokenType: tok, TokenValue: lit})
 	} else if tok == Lexer.ELSE {
-		restCondition.AbstractSyntaxTree = append(restCondition.AbstractSyntaxTree, lit)
+		else_token := lit
+		restCondition.Children = append(restCondition.Children, ASTNode{TokenType: tok, TokenValue: lit})
 		// check for <ordenes>
-		statements, err := p.ParseStatements()
+		statements, statements_value, err := p.ParseStatements()
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
-		restCondition.AbstractSyntaxTree = append(restCondition.AbstractSyntaxTree, statements)
+		restCondition.Children = append(restCondition.Children, *statements)
 
 		// check for end
 		tok, lit = p.scanIgnoreWhitespace()
 		if tok != Lexer.END {
-			return nil, fmt.Errorf("expected end, got %s", lit)
+			return nil, "", fmt.Errorf("expected end, got %s", lit)
 		}
-		restCondition.AbstractSyntaxTree = append(restCondition.AbstractSyntaxTree, lit)
+		restCondition.Children = append(restCondition.Children, ASTNode{TokenType: tok, TokenValue: lit})
+		result := fmt.Sprintf("%s %s %s", else_token, statements_value, lit)
+		restCondition.TokenValue = result
 
 	} else {
-		return nil, fmt.Errorf("expected end or else, got %s", lit)
+		return nil, "", fmt.Errorf("expected end or else, got %s", lit)
 	}
 
-	return restCondition, nil
+	return restCondition, restCondition.TokenValue, nil
 }

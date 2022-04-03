@@ -7,33 +7,33 @@ import (
 
 //<asignar> → <identificador> = <expresion_arit>
 
-type Assign struct {
-	AbstractSyntaxTree []interface{}
-}
-
-func (p *Parser) ParseAssign() (*Assign, error) {
-	assign := &Assign{}
+func (p *Parser) ParseAssign() (*ASTNode, string, error) {
+	assign := &ASTNode{TokenType: Lexer.ASSIGNMENT}
 
 	fmt.Println("ParseAssign")
 	tok, lit := p.scanIgnoreWhitespace()
 	fmt.Println("tok: ", tok, lit)
 	if tok != Lexer.ID {
-		return nil, fmt.Errorf("expected identifier, got %s", lit)
+		return nil, "", fmt.Errorf("expected identifier, got %s", lit)
 	}
-	assign.AbstractSyntaxTree = append(assign.AbstractSyntaxTree, lit)
+	id_value := lit
+	assign.Children = append(assign.Children, ASTNode{TokenType: tok, TokenValue: lit})
 
 	tok, lit = p.scanIgnoreWhitespace()
 	fmt.Println("tok: ", tok, lit)
 	if tok != Lexer.ASSIGN {
-		return nil, fmt.Errorf("expected =, got %s", lit)
+		return nil, "", fmt.Errorf("expected =, got %s", lit)
 	}
-	assign.AbstractSyntaxTree = append(assign.AbstractSyntaxTree, lit)
+	assign.Children = append(assign.Children, ASTNode{TokenType: tok, TokenValue: lit})
 
-	exp, err := p.ParseExpression()
+	exp, exp_value, err := p.ParseExpression()
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
-	assign.AbstractSyntaxTree = append(assign.AbstractSyntaxTree, exp)
+	assign.Children = append(assign.Children, *exp)
 
-	return assign, nil
+	result := fmt.Sprintf("%s = %s", id_value, exp_value)
+	assign.TokenValue = result
+
+	return assign, assign.TokenValue, nil
 }

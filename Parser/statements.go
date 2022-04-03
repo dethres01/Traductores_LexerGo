@@ -7,20 +7,16 @@ import (
 
 // <ordenes> → <orden> ; <rest_ordenes>
 
-type Statements struct {
-	AbstractSyntaxTree []interface{}
-}
-
-func (p *Parser) ParseStatements() (*Statements, error) {
-	statements := &Statements{}
+func (p *Parser) ParseStatements() (*ASTNode, string, error) {
+	statements := &ASTNode{TokenType: Lexer.STATEMENTS}
 
 	// check for <orden>
 	fmt.Println("ParseStatements")
-	statement, err := p.ParseStatement()
+	statement, statement_value, err := p.ParseStatement()
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
-	statements.AbstractSyntaxTree = append(statements.AbstractSyntaxTree, statement)
+	statements.Children = append(statements.Children, *statement)
 
 	// check for ;
 	fmt.Println("ParseStatements check for ;")
@@ -28,16 +24,19 @@ func (p *Parser) ParseStatements() (*Statements, error) {
 	tok, lit := p.scanIgnoreWhitespace()
 	fmt.Println("tok: ", tok, lit)
 	if tok != Lexer.SEMICOLON {
-		return nil, fmt.Errorf("expected ;, got %s", lit)
+		return nil, "", fmt.Errorf("expected ;, got %s", lit)
 	}
-	statements.AbstractSyntaxTree = append(statements.AbstractSyntaxTree, lit)
+	statements.Children = append(statements.Children, ASTNode{TokenType: tok, TokenValue: lit})
 
 	// check for <rest_ordenes>
-	restStatements, err := p.ParseRestStatements()
+	restStatements, restStatements_value, err := p.ParseRestStatements()
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
-	statements.AbstractSyntaxTree = append(statements.AbstractSyntaxTree, restStatements)
+	statements.Children = append(statements.Children, *restStatements)
+	result := fmt.Sprintf("%s;%s", statement_value, restStatements_value)
 
-	return statements, nil
+	statements.TokenValue = result
+
+	return statements, statements.TokenValue, nil
 }

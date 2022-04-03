@@ -13,20 +13,18 @@ import (
 */
 // we  really don't check this here since it comes from the lexer
 
-type Identifier struct {
-	AbstractSyntaxTree []interface{}
-}
-
-func (p *Parser) ParseIdentifier() (*Identifier, error) {
-	Identifier := &Identifier{}
+func (p *Parser) ParseIdentifier() (*ASTNode, string, error) {
+	identifier := &ASTNode{TokenType: Lexer.IDENTIFIER}
+	// these are terminal nodes
 
 	fmt.Println("ParseIdentifier")
 
 	tok, lit := p.scanIgnoreWhitespace()
 	if tok != Lexer.ID {
-		return nil, fmt.Errorf("expected identifier, got %s", lit)
+		return nil, "", fmt.Errorf("expected identifier, got %s", lit)
 	}
-	Identifier.AbstractSyntaxTree = append(Identifier.AbstractSyntaxTree, lit)
+	identifier.TokenValue = lit
+	identifier.Children = append(identifier.Children, ASTNode{TokenType: tok, TokenValue: lit})
 
-	return Identifier, nil
+	return identifier, identifier.TokenValue, nil
 }

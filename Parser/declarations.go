@@ -11,35 +11,41 @@ type Declarations struct {
 
 //<declaraciones> → <declaracion>**;**<rest_declaracion>
 // this is the function to parse a variable declaration
-func (p *Parser) ParseDeclarations() (*Declarations, error) {
-	declarations := &Declarations{}
+func (p *Parser) ParseDeclarations() (*ASTNode, string, error) {
+	declarations := &ASTNode{TokenType: Lexer.DECLARATIONS}
 
 	fmt.Println("ParseDeclarations")
 
 	// check for <declaracion>
-	declaration, err := p.ParseDeclaration()
+	declaration, declaration_value, err := p.ParseDeclaration()
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	// print the declaration information to the console
-	fmt.Println("declaration: ", declaration.AbstractSyntaxTree)
-	declarations.AbstractSyntaxTree = append(declarations.AbstractSyntaxTree, declaration)
+
+	// add child to the declarations
+	declarations.Children = append(declarations.Children, *declaration)
 
 	// check for **;**
 	tok, lit := p.scanIgnoreWhitespace()
 	fmt.Println("tok: ", tok, lit)
 	if tok != Lexer.SEMICOLON {
-		return nil, fmt.Errorf("expected ;, got %s", lit)
+		return nil, "", fmt.Errorf("expected ;, got %s", lit)
 	}
-	declarations.AbstractSyntaxTree = append(declarations.AbstractSyntaxTree, lit)
+	// add child to the declarations
+	declarations.Children = append(declarations.Children, ASTNode{TokenType: tok, TokenValue: lit})
 
 	// check for <rest_declaracion>
-	restDeclaration, err := p.ParseRestDeclarations()
+	restDeclaration, restdeclaration_value, err := p.ParseRestDeclarations()
 
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
-	declarations.AbstractSyntaxTree = append(declarations.AbstractSyntaxTree, restDeclaration)
+	// add child to the declarations
+	declarations.Children = append(declarations.Children, *restDeclaration)
 
-	return declarations, nil
+	result := fmt.Sprintf("%s;%s", declaration_value, restdeclaration_value)
+	declarations.TokenValue = result
+
+	return declarations, declarations.TokenValue, nil
 }
