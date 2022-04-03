@@ -15,9 +15,9 @@ func (p *Parser) ParseType() (*Type, error) {
 	type_ := &Type{}
 	fmt.Println("ParseType")
 	// they are both terminals we check for them
-	tok, _ := p.scanIgnoreWhitespace()
+	tok, lit := p.scanIgnoreWhitespace()
 	if tok != Lexer.INT && tok != Lexer.FLOAT {
-		return nil, fmt.Errorf("expected type (int or float), got %s", tok)
+		return nil, fmt.Errorf("expected type (int or float), got %s", lit)
 	}
 	if tok == Lexer.INT {
 		type_.AbstractSyntaxTree = append(type_.AbstractSyntaxTree, "int")
