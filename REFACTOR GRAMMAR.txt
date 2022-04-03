@@ -1,0 +1,46 @@
+<programa> → **begin** <declaraciones> <ordenes> **end**
+
+<declaraciones> → <declaracion>**;**<rest_declaracion>
+
+<rest_declaraciones> → <declaracion>**;**<rest_declaracion> | **epsilon**
+
+<declaracion> → <tipo> <lista_variables>
+<tipo> → **entero** | **real**
+
+<lista_variables> → <identificador> <rest_lista_variables>
+
+<rest_lista_variables> → **,**<lista_variables> | **epsilon**
+
+<identificador> → <letra> | <letra><resto_letras>
+<letra> → **A..Za..z**
+<resto_letras> → <letraN> | <letraN><resto_letras>
+<letraN> → **0..9A..Za..z**
+
+<ordenes> → <orden> **; <rest_ordenes>**
+
+<rest_ordenes> → <orden>; <rest_ordenes> | **epsilon**
+
+<orden> → <condicion> | <bucle_while> | <asignar>
+
+<condicion> → **if (**<comparación>) <ordenes> <rest_condicion>
+
+<rest_condicion> → **end** | **else** <ordenes> **end**
+
+<comparacion> → <operador> <condicion_op> <operador>
+<condicion_op> → **=** | **<** | **>** | **<=** | **>=** | **<>**
+
+<operador> → <identificador> | <numeros>
+<numeros> → <numero_entero> | <numero_real>
+
+<numero_entero> → <numero> | <numero><numero_entero>
+<numero> → **0..9**
+<numero_real> → <numero_entero>.<numero_entero>
+<bucle_while> → while (<comparacion>) <ordenes> endwhile
+<asignar> → <identificador> := <expresion_arit>
+<numero_real> → <numero_entero>**.**<numero_entero>
+
+<expresion_arit> → **(**<expresion_arit><operador_arit><expresion_arit>**)** <rest_arit>| <identificador> <rest_arit>| <numeros><rest_arit>
+
+<rest_arit> → <operador_arit><expresion_arit><rest_arit> | **epsilon**
+
+<operador_arit> → **+** | **-** | ***** | **/**

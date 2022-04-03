@@ -3,7 +3,6 @@ package Lexer
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"io"
 	"unicode"
 )
@@ -12,75 +11,57 @@ type Token int // Token types
 
 // Token types
 const (
-	EOF     = iota
-	ILLEGAL // illegal token 1
-	WS      // Whitespace 2
-	IDENT   // Identifier 3
-	SEMI    // ; 4
+	EOF = iota
+	ILLEGAL
+	EPSILON
+	WS
+	// GRAMMAR TERMINALS
+	BEGIN
+	END
+	ID
+	IF
+	ELSE
+	WHILE
+	ENDWHILE
+	// ASSIGNMENT
+	ASSIGN
 
-	// Infix operators.
-	ADD // + 5
-	SUB // - 6
-	MUL // * 7
-	DIV // / 8
+	// GRAMMAR TERMINAL SYMBOLS
+	SEMICOLON
+	COMMA
+	RPAREN
+	LPAREN
+	POINT
 
-	ASSIGN      // =  10
-	DECLARATION // : 11
-	// Symbols
-	LPAREN // (  12
-	RPAREN // )  13
-	LBRACE // {  14
-	RBRACE // }  15
-	// Keywords.
-	// data types
-	INT    // int 16
-	STRING // string 17
-	BOOL   // bool 18
-	// Conditionals 19
-	IF   // if 20
-	THEN // THEN 21
-	ELSE // ELSE 22
-	// Loops
-	WHILE // while 23
-	DO    // d 24
-	BREAK // break 25
-	// various keywords
-	TRUE  // true 26
-	FALSE // false 27
-	// functions
-	FUNC   // func 28
-	RETURN // return 29
-	PRINT  // print 30
-	VAR    //31
-	// comparative symbols
-	EQUALS              // == 32
-	LESS_THAN           // < 33
-	MORE_THAN           // > 34
-	MORE_OR_EQUALS_THAN // >= 35
-	LESS_OR_EQUALS_THAN // <= 36
-	NOT                 // ! 37
-	NOT_EQUALS          // != 38
-	END                 // end 39
+	// DATA TYPES
+	INT
+	FLOAT
+
+	// CONDITIONAL OPERATORS
+	EQUALS
+	NOT_EQUALS
+	LESS_THAN
+	MORE_THAN
+	LESS_OR_EQUALS_THAN
+	MORE_OR_EQUALS_THAN
+
+	// ARITHMETIC OPERATORS
+	ADD
+	SUB
+	MUL
+	DIV
 )
 
 //ARRAY OF KEYWORDS
 var keywords = map[string]Token{
-	"int":    INT,
-	"string": STRING,
-	"bool":   BOOL,
-	"if":     IF,
-	"then":   THEN,
-	"else":   ELSE,
-	"while":  WHILE,
-	"do":     DO,
-	"break":  BREAK,
-	"true":   TRUE,
-	"false":  FALSE,
-	"func":   FUNC,
-	"print":  PRINT,
-	"return": RETURN,
-	"var":    VAR,
-	"end":    END,
+	"begin":    BEGIN,
+	"end":      END,
+	"if":       IF,
+	"else":     ELSE,
+	"while":    WHILE,
+	"endwhile": ENDWHILE,
+	"int":      INT,
+	"float":    FLOAT,
 }
 
 func isWhiteSpace(ch rune) bool {
@@ -93,11 +74,14 @@ func isLetter(ch rune) bool {
 func isNumber(ch rune) bool {
 	return unicode.IsDigit(ch)
 }
-func checkComparison(ch rune) bool {
-	return (ch == '<' || ch == '>' || ch == '=' || ch == '!')
+func checkComplex(ch rune) bool {
+	return (ch == '<' || ch == '>' || ch == '=')
 }
 func IsComparative(tok Token) bool {
-	return tok == EQUALS || tok == LESS_THAN || tok == MORE_THAN || tok == MORE_OR_EQUALS_THAN || tok == LESS_OR_EQUALS_THAN || tok == NOT || tok == NOT_EQUALS
+	return tok == EQUALS || tok == LESS_THAN || tok == MORE_THAN || tok == MORE_OR_EQUALS_THAN || tok == LESS_OR_EQUALS_THAN || tok == NOT_EQUALS
+}
+func IsInfix(tok Token) bool {
+	return tok == ADD || tok == SUB || tok == MUL || tok == DIV || tok == ASSIGN
 }
 
 var eof = rune(0)
@@ -122,22 +106,6 @@ func (s *Scanner) unread() { _ = s.r.UnreadRune() }
 
 func (s *Scanner) Scan() (tok Token, lit string) {
 	ch := s.read()
-
-	if isWhiteSpace(ch) {
-		s.unread()
-		return s.scanWhitespace()
-	} else if isLetter(ch) {
-		s.unread()
-		return s.scanIdent()
-	} else if isNumber(ch) {
-		s.unread()
-		return s.scanNumber()
-	} else if checkComparison(ch) {
-		// we have to check if it is a comparative symbol
-		s.unread()
-		return s.scanComparison()
-	}
-	// if it isn't one of those it's a token
 	switch ch {
 	case eof:
 		return EOF, ""
@@ -149,19 +117,27 @@ func (s *Scanner) Scan() (tok Token, lit string) {
 		return MUL, string(ch)
 	case '/':
 		return DIV, string(ch)
-	case '=':
-		return ASSIGN, string(ch)
-	case '(':
-		return LPAREN, string(ch)
+	case ';':
+		return SEMICOLON, string(ch)
+	case ',':
+		return COMMA, string(ch)
 	case ')':
 		return RPAREN, string(ch)
-	case '{':
-		return LBRACE, string(ch)
-	case '}':
-		return RBRACE, string(ch)
-	case ';':
-		return EOF, string(ch)
+	case '(':
+		return LPAREN, string(ch)
+	case '.':
+		return POINT, string(ch)
 	default:
+		// we have to check for complex symbols like comparative, identifiers, numbers
+		if isWhiteSpace(ch) {
+			return s.scanWhitespace()
+		} else if isLetter(ch) {
+			return s.scanIdent()
+		} else if isNumber(ch) {
+			return s.scanNumber()
+		} else if checkComplex(ch) {
+			return s.scanComplex()
+		}
 		return ILLEGAL, string(ch)
 	}
 }
@@ -169,9 +145,8 @@ func (s *Scanner) scanWhitespace() (tok Token, lit string) {
 	var buf bytes.Buffer
 	buf.WriteRune(s.read())
 	for {
-		fmt.Println("scanning whitespace")
-		fmt.Println(buf.String())
 		if ch := s.read(); ch == eof {
+			break
 		} else if !isWhiteSpace(ch) {
 			s.unread()
 			break
@@ -199,10 +174,10 @@ func (s *Scanner) scanIdent() (tok Token, lit string) {
 	if tok, ok := keywords[str]; ok {
 		return tok, str
 	}
-	return IDENT, str
+	return ID, str
 }
 
-// De momento solo se puede leer numeros enteros
+// TODO: Could probably simplify function, we have two exact blocks of code
 func (s *Scanner) scanNumber() (tok Token, lit string) {
 	var buf bytes.Buffer
 	buf.WriteRune(s.read())
@@ -216,15 +191,37 @@ func (s *Scanner) scanNumber() (tok Token, lit string) {
 			buf.WriteRune(ch)
 		}
 	}
+	// check for point to see if it is a float
+
+	if ch := s.read(); ch == '.' {
+		buf.WriteRune(ch)
+
+		if ch := s.read(); isNumber(ch) {
+			buf.WriteRune(ch)
+			for {
+				if ch := s.read(); ch == eof {
+					break
+				} else if !isNumber(ch) {
+					s.unread()
+					break
+				} else {
+					buf.WriteRune(ch)
+				}
+			}
+			return FLOAT, buf.String()
+		} else {
+			s.unread()
+		}
+	}
 	return INT, buf.String()
 }
-func (s *Scanner) scanComparison() (tok Token, lit string) {
+func (s *Scanner) scanComplex() (tok Token, lit string) {
 	var buf bytes.Buffer
 	buf.WriteRune(s.read())
 	for {
 		if ch := s.read(); ch == eof {
 			break
-		} else if !checkComparison(ch) {
+		} else if !checkComplex(ch) {
 			s.unread()
 			break
 		} else {
@@ -243,16 +240,11 @@ func (s *Scanner) scanComparison() (tok Token, lit string) {
 		return MORE_OR_EQUALS_THAN, buf.String()
 	case "<=":
 		return LESS_OR_EQUALS_THAN, buf.String()
-	case "!":
-		return NOT, buf.String()
-	case "!=":
+	case "<>":
 		return NOT_EQUALS, buf.String()
 	case "=":
 		return ASSIGN, buf.String()
 	default:
 		return ILLEGAL, buf.String()
 	}
-}
-func IsInfix(tok Token) bool {
-	return tok == ADD || tok == SUB || tok == MUL || tok == DIV || tok == ASSIGN
 }
