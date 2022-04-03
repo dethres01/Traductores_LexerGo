@@ -2,7 +2,6 @@ package Parser
 
 import (
 	"AnalisisLexico/Lexer"
-	"fmt"
 )
 
 type Parser struct {
@@ -34,14 +33,9 @@ func (p *Parser) unscan() { p.buf.n = 1 }
 // might not need it
 func (p *Parser) scanIgnoreWhitespace() (tok Lexer.Token, lit string) {
 	tok, lit = p.scan()
-	fmt.Println("Scan")
-	fmt.Println(tok, lit)
-	fmt.Println(p.buf.n)
 	for tok == Lexer.WS {
 		tok, lit = p.scan()
 	}
-	fmt.Println("after")
-	fmt.Println(tok, lit)
-	fmt.Println(p.buf.n)
+
 	return
 }
