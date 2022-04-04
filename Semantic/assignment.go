@@ -53,15 +53,10 @@ func getExpressionInfo(expression Parser.ASTNode, s *SemanticAnalysis, identifie
 		}
 		// we really don't have to do checks for operator arit atm
 		// we will have to do it later to make the actual operations tho.
-
-		err = getExpressionInfo(expression.Children[3], s, identifier)
-		if err != nil {
-			return err
-		}
 		// RPN
 		// children 6 should be rest_exp
 		// rest_exp is a recursive call
-		err = getRestExpressionInfo(expression.Children[5], s, identifier)
+		err = getRestExpressionInfo(expression.Children[3], s, identifier)
 		if err != nil {
 			return err
 		}

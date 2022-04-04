@@ -23,7 +23,7 @@ func (p *Parser) ParseIdentifier() (*ASTNode, string, error) {
 	}
 	identifier.TokenValue = lit
 	identifier.Children = append(identifier.Children, ASTNode{TokenType: tok, TokenValue: lit})
-	fmt.Println("identifier: ", identifier)
+	//fmt.Println("identifier: ", identifier)
 
 	return identifier, identifier.TokenValue, nil
 }

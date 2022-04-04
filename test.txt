@@ -4,7 +4,7 @@ int i,a,b;
 float x,y,z;
 int j;
 
-i = 10;
+i = 10+10;
 while(i>0) 
     b=a; 
 endwhile;
@@ -14,4 +14,5 @@ if (i == 10)
 else   
     x=1.25;
 end;
+b = (a+b*d/c)+i;
 end
