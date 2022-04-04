@@ -2,6 +2,8 @@ begin
 
 int i,a,b;
 float x,y,z;
+int j;
+float i;
 
 i = 10;
 while(i>0) 

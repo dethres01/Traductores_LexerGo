@@ -3,7 +3,6 @@ package Lexer
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"io"
 	"unicode"
 )
@@ -217,7 +216,7 @@ func (s *Scanner) scanNumber() (tok Token, lit string) {
 	var buf bytes.Buffer
 	isFloat := false
 	buf.WriteRune(s.read())
-	fmt.Println("floating test", buf.String())
+
 	for {
 		if ch := s.read(); ch == eof {
 			break
@@ -227,7 +226,7 @@ func (s *Scanner) scanNumber() (tok Token, lit string) {
 				isFloat = true
 				buf.WriteRune(ch)
 			} else if isFloat && ch == '.' {
-				fmt.Println("floating test", buf.String())
+
 				return ILLEGAL, buf.String()
 			} else {
 				s.unread()
@@ -239,7 +238,7 @@ func (s *Scanner) scanNumber() (tok Token, lit string) {
 		}
 	}
 	// check for point to see if it is a float
-	fmt.Println("floating test", buf.String())
+
 	if isFloat {
 		return FLOAT, buf.String()
 	}

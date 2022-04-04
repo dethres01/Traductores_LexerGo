@@ -3,6 +3,7 @@ package main
 import (
 	"AnalisisLexico/Lexer"
 	"AnalisisLexico/Parser"
+	"AnalisisLexico/Semantic"
 	"fmt"
 	"os"
 )
@@ -27,5 +28,14 @@ func main() {
 	}
 	// fmt.Println(result)
 	// print tree
-	fmt.Println(result.Root.TokenValue)
+	//fmt.Println(result.Root.TokenValue)
+
+	// start semantic analysis
+	//fmt.Println("Semantic analysis")
+	fmt.Println(len(result.Children))
+	se := Semantic.NewSemanticAnalysis(result)
+	err = se.Start()
+	if err != nil {
+		fmt.Println(err)
+	}
 }
