@@ -49,16 +49,7 @@ func NewSymbol(name string, type_ Lexer.Token, value interface{}) *Symbol {
 		Value: value,
 	}
 }
-func (sb *SymbolTable) AddVariable(name string, type_ Lexer.Token) error {
-	//we need to check if the variable is already declared
-	if _, ok := sb.SymbolTable[name]; ok {
-		// if it is already declared we need to throw an error
-		// we can do this by returning an error
-		return fmt.Errorf("variable %s already declared", name)
-	}
-	sb.SymbolTable[name] = NewSymbol(name, type_, nil)
-	return nil
-}
+
 func NewSemanticAnalysis(ast *Parser.AST) *SemanticAnalysis {
 	return &SemanticAnalysis{
 		AST: ast,
@@ -108,6 +99,10 @@ func (s *SemanticAnalysis) Start() error {
 	// because we need to check if the variables are declared
 
 	err := s.AnalyzeDeclarations(s.AST.Children[1])
+	if err != nil {
+		return err
+	}
+	err = s.AnalyzeStatements(s.AST.Children[2])
 	if err != nil {
 		return err
 	}
