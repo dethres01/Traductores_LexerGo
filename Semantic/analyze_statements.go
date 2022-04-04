@@ -26,7 +26,14 @@ func (s *SemanticAnalysis) AnalyzeStatements(statements Parser.ASTNode) error {
 	if err != nil {
 		return err
 	}
-	//rest_statement_node := statements.Children[2]
+
+	rest_statement_node := statements.Children[2]
+	if rest_statement_node.TokenValue != "" {
+		err := s.AnalyzeStatements(rest_statement_node)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
@@ -36,61 +43,23 @@ func getStatementInfo(statement Parser.ASTNode, s *SemanticAnalysis) error {
 	node := statement.Children[0]
 	switch node.TokenType {
 	case Lexer.ASSIGNMENT:
-		// <asignacion> → <identificador> = <expresion>
-		// let's check the tree
-		//printSubTree(node, 0)
-		// supossed to have 3 children
-		if len(node.Children) != 3 {
-			return fmt.Errorf("(False Positive on ASSIGN ParserSide), got %d", len(node.Children))
-		}
-		// <identificador>
-		identifier := node.Children[0]
-		// check if the identifier is declared
-		if !s.SymbolTable.checkExistence(identifier.TokenValue) {
-			return fmt.Errorf("variable %s is not declared", identifier.TokenValue)
-		}
-		// we have confirmed that the identifier is declared
-
-		// so now we have to check the expression
-		// <expresion>
-		expression := node.Children[2]
-		printSubTree(expression, 0)
-		// check grammar
-		////<expresion_arit> → (<expresion_arit><operador_arit><expresion_arit>) <rest_arit>
-		//|	 <identificador> <rest_arit>
-		//| <numeros><rest_arit>
-
-		// so we have to check the expression and see which type of expression it is
-		// we check for first children tokentype
-		switch expression.Children[0].TokenType {
-		case Lexer.INT:
-			// done
-			if !s.SymbolTable.compareType(identifier.TokenValue, Lexer.INT) {
-				return fmt.Errorf("variable %s is not of type int", identifier.TokenValue)
-			}
-
-		case Lexer.FLOAT:
-			// done
-			if !s.SymbolTable.compareType(identifier.TokenValue, Lexer.FLOAT) {
-				return fmt.Errorf("variable %s is not of type float", identifier.TokenValue)
-			}
-		case Lexer.IDENTIFIER:
-			// check if the identifier is declared
-			if !s.SymbolTable.checkExistence(expression.Children[0].TokenValue) {
-				return fmt.Errorf("variable %s is not declared", expression.Children[0].TokenValue)
-			}
-			// we have to confirm if the identifiers are the same type
-			if !s.SymbolTable.compareTypes(identifier.TokenValue, expression.Children[0].TokenValue) {
-				return fmt.Errorf("variable %s is not of the same type as %s", expression.Children[0].TokenValue, identifier.TokenValue)
-			}
-		case Lexer.LPAREN:
-
+		err := getAssignmentInfo(node, s)
+		if err != nil {
+			return err
 		}
 		//<rest_arit> → <operador_arit><expresion_arit><rest_arit> | epsilon
 
 	case Lexer.WHILE_LOOP:
+		err := getWhileLoopInfo(node, s)
+		if err != nil {
+			return err
+		}
 
 	case Lexer.CONDITION:
+		err := getConditionInfo(node, s)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

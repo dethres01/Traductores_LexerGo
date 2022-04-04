@@ -38,5 +38,6 @@ func (sb *SymbolTable) compareTypes(name1 string, name2 string) bool {
 
 // compare a variable's type with a type
 func (sb *SymbolTable) compareType(name string, type_ Lexer.Token) bool {
+	//fmt.Println(sb.getType(name), type_)
 	return sb.getType(name) == type_
 }

@@ -6,7 +6,7 @@ int j;
 
 i = 10;
 while(i>0) 
-    c=a; 
+    b=a; 
 endwhile;
 if (i == 10) 
     a = 1; 
