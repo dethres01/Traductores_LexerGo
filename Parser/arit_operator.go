@@ -9,7 +9,6 @@ import (
 
 func (p *Parser) ParseOperatorArit() (*ASTNode, string, error) {
 	operatorArit := &ASTNode{TokenType: Lexer.OPERATOR_ARIT}
-	fmt.Println("ParseOperatorArit")
 	// either + or - or * or /
 	tok, lit := p.scanIgnoreWhitespace()
 	if Lexer.IsInfix(tok) {

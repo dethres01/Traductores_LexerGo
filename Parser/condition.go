@@ -9,7 +9,6 @@ import (
 
 func (p *Parser) ParseCondition() (*ASTNode, string, error) {
 	condition := &ASTNode{TokenType: Lexer.CONDITION}
-	fmt.Println("ParseCondition")
 	// check for if
 	tok, lit := p.scanIgnoreWhitespace()
 	if tok != Lexer.IF {

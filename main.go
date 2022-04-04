@@ -27,8 +27,5 @@ func main() {
 	}
 	// fmt.Println(result)
 	// print tree
-
-	for _, v := range result.AbstractSyntaxTree {
-		fmt.Println(v.TokenValue)
-	}
+	fmt.Println(result.Root.TokenValue)
 }

@@ -10,7 +10,6 @@ import (
 func (p *Parser) ParseWhileLoop() (*ASTNode, string, error) {
 	whileLoop := &ASTNode{TokenType: Lexer.WHILE_LOOP}
 
-	fmt.Println("ParseWhileLoop")
 	// check for while
 	tok, lit := p.scanIgnoreWhitespace()
 	if tok != Lexer.WHILE {

@@ -10,16 +10,14 @@ import (
 func (p *Parser) ParseRestStatements() (*ASTNode, string, error) {
 	restStatements := &ASTNode{TokenType: Lexer.REST_STATEMENTS}
 	// we check for a statement, otherwise we return epsilon
-	fmt.Println("ParseRestStatements")
-	tok, lit := p.scanIgnoreWhitespace()
-	fmt.Println("tok: ", tok, lit)
+
+	tok, _ := p.scanIgnoreWhitespace()
+
 	// probably should do a function to avoid a false positive
 	if !Lexer.IsStatement(tok) || tok == Lexer.ELSE {
 		// false positive because of or negative operations
-		fmt.Println("returning epsilon")
 		p.unscan()
 	} else {
-		fmt.Println("returning statement")
 		p.unscan()
 		statement, statement_value, err := p.ParseStatement()
 		if err != nil {
@@ -28,7 +26,6 @@ func (p *Parser) ParseRestStatements() (*ASTNode, string, error) {
 		restStatements.Children = append(restStatements.Children, *statement)
 
 		// check for ;
-		fmt.Println("ParseRestStatements check for ;")
 		tok, lit := p.scanIgnoreWhitespace()
 		if tok != Lexer.SEMICOLON {
 			return nil, "", fmt.Errorf("expected ;, got %s", lit)

@@ -5,12 +5,13 @@ import (
 	"fmt"
 )
 
-// <program> -> begin <declarations> <statements> end
+// <AST> -> begin <declarations> <statements> end
 
-// Program is the root of the AST
+// AST is the root of the AST
 
-type Program struct {
-	AbstractSyntaxTree []ASTNode
+type AST struct {
+	Root     *ASTNode
+	Children []ASTNode
 }
 
 type ASTNode struct {
@@ -19,8 +20,8 @@ type ASTNode struct {
 	Children   []ASTNode
 }
 
-func (p *Parser) ParseProgram() (*Program, error) {
-	program := &Program{}
+func (p *Parser) ParseProgram() (*AST, error) {
+	AST := &AST{}
 
 	// check for begin
 	tok, lit := p.scanIgnoreWhitespace()
@@ -29,32 +30,32 @@ func (p *Parser) ParseProgram() (*Program, error) {
 	}
 	// create new node
 	// it has no children since it's a terminal node
-	program.AbstractSyntaxTree = append(program.AbstractSyntaxTree, ASTNode{TokenType: tok, TokenValue: lit})
+	AST.Children = append(AST.Children, ASTNode{TokenType: tok, TokenValue: lit})
 
 	// check for declarations
-	declaration, _, err := p.ParseDeclarations()
+	declaration, d, err := p.ParseDeclarations()
 	if err != nil {
 		return nil, err
 	}
-	//fmt.Println("declarations: ", declaration)
 
-	// add child to the program
-	program.AbstractSyntaxTree = append(program.AbstractSyntaxTree, *declaration)
+	// add child to the AST
+	AST.Children = append(AST.Children, *declaration)
 
 	// check for statement
-	statement, _, err := p.ParseStatements()
+	statement, s, err := p.ParseStatements()
 	if err != nil {
 		return nil, err
 	}
-	//fmt.Println("statement: ", statement)
-	program.AbstractSyntaxTree = append(program.AbstractSyntaxTree, *statement)
+	AST.Children = append(AST.Children, *statement)
 
 	// check for end
 	tok, lit = p.scanIgnoreWhitespace()
 	if tok != Lexer.END {
 		return nil, fmt.Errorf("expected end, got %s", lit)
 	}
-	program.AbstractSyntaxTree = append(program.AbstractSyntaxTree, ASTNode{TokenType: tok, TokenValue: lit})
+	AST.Children = append(AST.Children, ASTNode{TokenType: tok, TokenValue: lit})
+	result := fmt.Sprintf("%s %s %s %s", "begin", d, s, "end")
+	AST.Root = &ASTNode{TokenType: Lexer.PROGRAM, TokenValue: result}
 
-	return program, nil
+	return AST, nil
 }

@@ -13,7 +13,7 @@ type VariableList struct {
 
 func (p *Parser) ParseVariableList() (*ASTNode, string, error) {
 	variableList := &ASTNode{TokenType: Lexer.VARIABLE_LIST}
-	fmt.Println("ParseVariableList")
+
 	// check for <identificador>
 	identifier, identifier_value, err := p.ParseIdentifier()
 	if err != nil {

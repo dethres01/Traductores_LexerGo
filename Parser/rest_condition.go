@@ -9,7 +9,6 @@ import (
 
 func (p *Parser) ParseRestCondition() (*ASTNode, string, error) {
 	restCondition := &ASTNode{TokenType: Lexer.REST_CONDITION}
-	fmt.Println("ParseRestCondition")
 	// it has to be either end or else
 	tok, lit := p.scanIgnoreWhitespace()
 	if tok == Lexer.END {

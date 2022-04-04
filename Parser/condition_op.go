@@ -9,7 +9,6 @@ import (
 
 func (p *Parser) ParseConditionOp() (*ASTNode, string, error) {
 	condition_op := &ASTNode{TokenType: Lexer.CONDITION_OP}
-	fmt.Println("ParseConditionOp")
 	// it has to be either ==, <, >, <=, >= or <>
 	tok, lit := p.scanIgnoreWhitespace()
 	if Lexer.IsComparative(tok) {

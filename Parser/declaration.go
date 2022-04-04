@@ -9,7 +9,7 @@ import (
 
 func (p *Parser) ParseDeclaration() (*ASTNode, string, error) {
 	declaration := &ASTNode{TokenType: Lexer.DECLARATION}
-	fmt.Println("ParseDeclaration")
+
 	// check for <tipo>
 	tipo, type_value, err := p.ParseType()
 	if err != nil {

@@ -10,9 +10,8 @@ import (
 func (p *Parser) ParseAssign() (*ASTNode, string, error) {
 	assign := &ASTNode{TokenType: Lexer.ASSIGNMENT}
 
-	fmt.Println("ParseAssign")
 	tok, lit := p.scanIgnoreWhitespace()
-	fmt.Println("tok: ", tok, lit)
+
 	if tok != Lexer.ID {
 		return nil, "", fmt.Errorf("expected identifier, got %s", lit)
 	}
@@ -20,7 +19,6 @@ func (p *Parser) ParseAssign() (*ASTNode, string, error) {
 	assign.Children = append(assign.Children, ASTNode{TokenType: tok, TokenValue: lit})
 
 	tok, lit = p.scanIgnoreWhitespace()
-	fmt.Println("tok: ", tok, lit)
 	if tok != Lexer.ASSIGN {
 		return nil, "", fmt.Errorf("expected =, got %s", lit)
 	}

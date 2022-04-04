@@ -14,7 +14,7 @@ type Type struct {
 func (p *Parser) ParseType() (*ASTNode, string, error) {
 	type_ := &ASTNode{}
 	// these are terminal nodes
-	fmt.Println("ParseType")
+
 	// they are both terminals we check for them
 	tok, lit := p.scanIgnoreWhitespace()
 	if tok != Lexer.INT && tok != Lexer.FLOAT {

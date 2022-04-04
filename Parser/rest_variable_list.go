@@ -11,9 +11,8 @@ func (p *Parser) ParseRestVariableList() (*ASTNode, string, error) {
 	restVariableList := &ASTNode{TokenType: Lexer.REST_VARIABLE_LIST}
 
 	// check for ,
-	fmt.Println("ParseRestVariableList")
+
 	tok, lit := p.scanIgnoreWhitespace()
-	fmt.Println("ParseRestVariableList", tok, lit)
 	// this could be either blank(epsilon) or ,
 	if tok != Lexer.COMMA {
 		// if it's not , then we put the token back

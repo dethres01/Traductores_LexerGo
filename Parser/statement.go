@@ -10,7 +10,6 @@ import (
 func (p *Parser) ParseStatement() (*ASTNode, string, error) {
 	statement := &ASTNode{TokenType: Lexer.STATEMENT}
 
-	fmt.Println("ParseStatement")
 	// condition or while loop or assign
 	// we have to find out which one it is
 	tok, lit := p.scanIgnoreWhitespace()

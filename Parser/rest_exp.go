@@ -2,21 +2,18 @@ package Parser
 
 import (
 	"AnalisisLexico/Lexer"
-	"fmt"
 )
 
 // <rest_arit> → <operador_arit><expresion_arit><rest_arit> | epsilon
 
 func (p *Parser) ParseRestExp() (*ASTNode, string, error) {
 	restExp := &ASTNode{TokenType: Lexer.REST_EXP}
-	fmt.Println("ParseRestExp")
-	fmt.Println("buffer tok: ", p.buf.tok, p.buf.lit)
+
 	// blank or infix operator
-	tok, lit := p.scanIgnoreWhitespace()
-	fmt.Println("tok: ", tok, lit)
+	tok, _ := p.scanIgnoreWhitespace()
+
 	if Lexer.IsInfix(tok) {
 		p.unscan()
-		fmt.Println("ParseRestExp Infix Entered")
 		// <operador_arit>
 		operatorArit, operatorArit_value, err := p.ParseOperatorArit()
 		if err != nil {
@@ -41,8 +38,6 @@ func (p *Parser) ParseRestExp() (*ASTNode, string, error) {
 		restExp.TokenValue = result
 	} else {
 		p.unscan()
-		fmt.Println("ParseRestExp Epsilon Entered")
-		fmt.Println("buf: ", p.buf.tok, p.buf.lit)
 	}
 
 	return restExp, restExp.TokenValue, nil

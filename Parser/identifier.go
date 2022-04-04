@@ -17,8 +17,6 @@ func (p *Parser) ParseIdentifier() (*ASTNode, string, error) {
 	identifier := &ASTNode{TokenType: Lexer.IDENTIFIER}
 	// these are terminal nodes
 
-	fmt.Println("ParseIdentifier")
-
 	tok, lit := p.scanIgnoreWhitespace()
 	if tok != Lexer.ID {
 		return nil, "", fmt.Errorf("expected identifier, got %s", lit)

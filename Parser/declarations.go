@@ -14,8 +14,6 @@ type Declarations struct {
 func (p *Parser) ParseDeclarations() (*ASTNode, string, error) {
 	declarations := &ASTNode{TokenType: Lexer.DECLARATIONS}
 
-	fmt.Println("ParseDeclarations")
-
 	// check for <declaracion>
 	declaration, declaration_value, err := p.ParseDeclaration()
 	if err != nil {
@@ -28,7 +26,6 @@ func (p *Parser) ParseDeclarations() (*ASTNode, string, error) {
 
 	// check for **;**
 	tok, lit := p.scanIgnoreWhitespace()
-	fmt.Println("tok: ", tok, lit)
 	if tok != Lexer.SEMICOLON {
 		return nil, "", fmt.Errorf("expected ;, got %s", lit)
 	}

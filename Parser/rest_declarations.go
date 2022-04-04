@@ -12,10 +12,10 @@ func (p *Parser) ParseRestDeclarations() (*ASTNode, string, error) {
 
 	// this could be either blank(epsilon) or <declaracion>;
 	// for performance reasons we could check for type since we know it's a declaration
-	tok, lit := p.scanIgnoreWhitespace()
-	fmt.Println("ParseRestDeclarations", tok, lit)
+	tok, _ := p.scanIgnoreWhitespace()
+
 	if !Lexer.IsNum(tok) {
-		fmt.Println("ParseRestDeclarations Entered type check")
+
 		// if it's not <declaracion>; then we put the token back
 		p.unscan()
 	} else {

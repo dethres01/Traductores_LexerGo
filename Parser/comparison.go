@@ -9,7 +9,6 @@ import (
 
 func (p *Parser) ParseComparison() (*ASTNode, string, error) {
 	comparison := &ASTNode{TokenType: Lexer.COMPARISON}
-	fmt.Println("ParseComparison")
 
 	// check for <operador>
 	operador, op1, err := p.ParseOperator()
