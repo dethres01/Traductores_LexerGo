@@ -19,6 +19,8 @@ func (p *Parser) ParseVariableList() (*ASTNode, string, error) {
 	if err != nil {
 		return nil, "", err
 	}
+	// here can add the identifier to the ic code
+	p.ic.Declaration(identifier_value)
 	// add child to the variable list
 	variableList.Children = append(variableList.Children, *identifier)
 

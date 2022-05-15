@@ -11,6 +11,7 @@ type Parser struct {
 		lit string
 		n   int
 	}
+	ic *IntermediateCode
 }
 
 func NewParser(s *Lexer.Scanner) *Parser {

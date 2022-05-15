@@ -21,15 +21,12 @@ type ASTNode struct {
 }
 
 func (p *Parser) ParseProgram() (*AST, error) {
+	p.ic = NewIntermediateCode("code.txt")
 	AST := &AST{}
-
-	// check for begin
 	tok, lit := p.scanIgnoreWhitespace()
 	if tok != Lexer.BEGIN {
 		return nil, fmt.Errorf("expected begin, got %s", lit)
 	}
-	// create new node
-	// it has no children since it's a terminal node
 	AST.Children = append(AST.Children, ASTNode{TokenType: tok, TokenValue: lit})
 
 	// check for declarations
@@ -56,6 +53,8 @@ func (p *Parser) ParseProgram() (*AST, error) {
 	AST.Children = append(AST.Children, ASTNode{TokenType: tok, TokenValue: lit})
 	result := fmt.Sprintf("%s %s %s %s", "begin", d, s, "end")
 	AST.Root = &ASTNode{TokenType: Lexer.PROGRAM, TokenValue: result}
+
+	p.ic.Print()
 
 	return AST, nil
 }

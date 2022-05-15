@@ -28,6 +28,7 @@ func (p *Parser) ParseAssign() (*ASTNode, string, error) {
 	if err != nil {
 		return nil, "", err
 	}
+	p.ic.Assignment(id_value, exp_value)
 	assign.Children = append(assign.Children, *exp)
 
 	result := fmt.Sprintf("%s = %s", id_value, exp_value)

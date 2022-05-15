@@ -38,4 +38,9 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+	f.Close()
+	// make an array of strings
+	// we need to read the file line by line
+	// we can use a scanner
+
 }
