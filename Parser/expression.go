@@ -23,14 +23,12 @@ func (p *Parser) ParseExpression() (*ASTNode, string, error) {
 		if err != nil {
 			return nil, "", err
 		}
-		fmt.Println("identifier: ", identifier)
 		expression.Children = append(expression.Children, *identifier)
 		expression.TokenValue = value
 
 	} else if Lexer.IsNum(tok) {
 		p.unscan()
 		tok, lit := p.scanIgnoreWhitespace()
-		fmt.Println("tok: ", tok, "lit: ", lit)
 		if !Lexer.IsNum(tok) {
 			return nil, "", fmt.Errorf("expected number, got %s", lit)
 		}
@@ -41,14 +39,12 @@ func (p *Parser) ParseExpression() (*ASTNode, string, error) {
 		p.unscan()
 		// left paren
 		tok, lit := p.scanIgnoreWhitespace()
-		fmt.Println("tok: ", tok, "lit: ", lit)
 		if tok != Lexer.LPAREN {
 			return nil, "", fmt.Errorf("expected (, got %s", lit)
 		}
 		expression.Children = append(expression.Children, ASTNode{TokenType: tok, TokenValue: lit})
 
 		// expression
-		fmt.Println("expression 1")
 		exp, exp_value, err := p.ParseExpression()
 		if err != nil {
 			return nil, "", err
@@ -58,7 +54,6 @@ func (p *Parser) ParseExpression() (*ASTNode, string, error) {
 		if tok != Lexer.RPAREN {
 			return nil, "", fmt.Errorf("expected ), got %s", lit)
 		}
-		fmt.Println("tok: ", tok, "lit: ", lit)
 		expression.Children = append(expression.Children, ASTNode{TokenType: tok, TokenValue: lit})
 		value := fmt.Sprintf("(%s)", exp_value)
 		expression.TokenValue = value

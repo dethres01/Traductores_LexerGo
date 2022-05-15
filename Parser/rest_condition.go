@@ -15,6 +15,8 @@ func (p *Parser) ParseRestCondition() (*ASTNode, string, error) {
 		restCondition.TokenValue = lit
 		restCondition.Children = append(restCondition.Children, ASTNode{TokenType: tok, TokenValue: lit})
 	} else if tok == Lexer.ELSE {
+		// add goto
+		p.ic.if_condition(lit)
 		else_token := lit
 		restCondition.Children = append(restCondition.Children, ASTNode{TokenType: tok, TokenValue: lit})
 		// check for <ordenes>
@@ -22,6 +24,7 @@ func (p *Parser) ParseRestCondition() (*ASTNode, string, error) {
 		if err != nil {
 			return nil, "", err
 		}
+		p.ic.EndIf(lit)
 		restCondition.Children = append(restCondition.Children, *statements)
 
 		// check for end

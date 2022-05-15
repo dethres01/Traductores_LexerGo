@@ -28,6 +28,7 @@ func (p *Parser) ParseCondition() (*ASTNode, string, error) {
 	if err != nil {
 		return nil, "", err
 	}
+	p.ic.if_condition(compv)
 	condition.Children = append(condition.Children, *comparison)
 
 	// check for )
@@ -43,7 +44,7 @@ func (p *Parser) ParseCondition() (*ASTNode, string, error) {
 		return nil, "", err
 	}
 	condition.Children = append(condition.Children, *statements)
-
+	p.ic.EndIf(compv)
 	// check for <rest_condicion>
 	restCondition, rest, err := p.ParseRestCondition()
 	if err != nil {

@@ -30,7 +30,7 @@ func (p *Parser) ParseWhileLoop() (*ASTNode, string, error) {
 		return nil, "", err
 	}
 	whileLoop.Children = append(whileLoop.Children, *comparacion)
-
+	p.ic.while(comparison_value)
 	// check for )
 	tok, lit = p.scanIgnoreWhitespace()
 	if tok != Lexer.RPAREN {
@@ -50,6 +50,7 @@ func (p *Parser) ParseWhileLoop() (*ASTNode, string, error) {
 	if tok != Lexer.ENDWHILE {
 		return nil, "", fmt.Errorf("expected endwhile, got %s", lit)
 	}
+	p.ic.EndWhile(comparison_value)
 	whileLoop.Children = append(whileLoop.Children, ASTNode{TokenType: tok, TokenValue: lit})
 	result := fmt.Sprintf("while (%s) %s endwhile", comparison_value, statements_value)
 	whileLoop.TokenValue = result

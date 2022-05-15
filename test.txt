@@ -11,8 +11,9 @@ endwhile;
 if (i == 10) 
     a = 1; 
     b=3;
-else   
-    x=1.25;
+else
+    a = 2;
+    b=4;
 end;
 b = (a+b*d/c)+i;
 end
